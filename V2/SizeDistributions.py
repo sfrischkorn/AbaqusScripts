@@ -25,7 +25,7 @@ class Random(SizeDistribution):
     """
     Generates a random distribution
     """
-    def __init__(self, num_inclusions, lower = 0.0, upper = 1.0):
+    def __init__(self, num_inclusions, lower = 0.001, upper = 0.999):
         self.distribution = [uniform(lower, upper) for x in range(num_inclusions)]
 
     

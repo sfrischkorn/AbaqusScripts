@@ -94,6 +94,7 @@ class Circle(Ellipse):
 
         return self.centre[0] + self.radius, self.centre[0]
 
+    @staticmethod
     def determine_max_radius(buffersize, numcircles, scalefactor):
         """
         Determines the Maximum radius of circles to fit into a unit square. The fit is based on all fitting across in a row,
@@ -110,6 +111,12 @@ class Circle(Ellipse):
     
         return (((1 - buffersize - buffersize*numcircles) / numcircles)/2) * scalefactor
 
+    @staticmethod
+    def determine_radius(max_radius, equalsize):
+        if equalsize:
+            return max_radius
+        else:
+            return uniform(0.01, max_radius)
 
     def is_location_inside_square(self, buffersize=0):
         """
@@ -127,23 +134,20 @@ class Circle(Ellipse):
     def check_intersect(self, circles):
         """
         The circles intesect if the distance between the centrepoints is less than the sum of the radii. Also check to make sure one
-        circle isn't wholly within another circle. It is squared to remove the need for a square root, and absolute value on the
+        circle isn't wholly within another circle. It returns True if they do intersect, and False if they do not.
         """
 
         for circle in circles:
             centre_distance = math.sqrt((self.centre[0] - circle.centre[0])**2 + (self.centre[1] - circle.centre[1])**2)
 
-            if math.fabs(self.radius - circle.radius) <= centre_distance <= (self.radius + circle.radius):
+            if centre_distance > self.radius + circle.radius:
+                return False
+            elif centre_distance <= math.fabs(self.radius - circle.radius):
+                return True
+            else:
                 return True
 
-        return False
     
-    def _determine_radius(max_radius, equalsize):
-        if equalsize:
-            return max_radius
-        else:
-            return uniform(0.01, max_radius)
-
     def __str__(self):
         return 'Centre: {}, radius: {}.'.format(self.centre, self.radius)
 

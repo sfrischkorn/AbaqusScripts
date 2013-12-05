@@ -35,7 +35,33 @@ class ShapesTests(unittest.TestCase):
         circle3 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=centre3, radius=0.15)
         result = circle1.check_intersect([circle2, circle3])
         self.assertTrue(result)
-        
+
+    def test_circles_intersect(self):
+        centre1 = 0.25, 0.25
+        centre2 = 0.35, 0.35
+        circle1 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=centre1, radius=0.2)
+        circle2 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=centre2, radius=0.2)
+        result = circle1.check_intersect([circle2])
+        self.assertTrue(result)
+
+    def test_circles_intersect2(self):
+        centre1 = 0.575, 0.658
+        centre2 = 0.576, 0.658
+        centre3 = 0.844, 0.247
+        centre4 = 0.095, 0.489
+        circle1 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=centre1, radius=0.16)
+        circle2 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=centre2, radius=0.196)
+        circle3 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=centre3, radius=0.118)
+        circle4 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=centre4, radius=0.086)
+
+        circles = []
+        result = circle1.check_intersect(circles)
+        self.assertFalse(result)
+
+        circles.append(circle1)
+        result = circle2.check_intersect(circles)
+        self.assertTrue(result)
+
     def test_do_circles_intersect_false(self):
         centre1 = 0.25, 0.25
         centre2 = 0.25, 0.75
