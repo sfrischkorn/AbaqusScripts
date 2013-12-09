@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{495d0017-8559-4bbe-8d4a-ec09f2b75050}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>ModelGenerator.py</StartupFile>
+    <StartupFile>Tests\ShapesTest.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -18,14 +18,16 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
     <Compile Include="Locations.py" />
-    <Compile Include="LocationsTest.py" />
+    <Compile Include="Tests\LocationsTest.py" />
     <Compile Include="SizeDistributions.py" />
-    <Compile Include="SizeDistributionsTest.py" />
+    <Compile Include="Tests\SizeDistributionsTest.py" />
     <Compile Include="ModelGenerator.py" />
-    <Compile Include="ShapesTest.py" />
+    <Compile Include="Tests\ShapesTest.py" />
     <Compile Include="Shapes.py" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Tests\" />
+  </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\2.7" />
   </ItemGroup>

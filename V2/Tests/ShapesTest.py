@@ -1,5 +1,10 @@
 import unittest
+import os
+import sys
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, parentdir)
 import Shapes
+
 from math import sqrt
 
 class ShapesTests(unittest.TestCase):
@@ -71,6 +76,14 @@ class ShapesTests(unittest.TestCase):
         circle3 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=centre3, radius=0.299)
         result = circle1.check_intersect([circle2, circle3])
         self.assertFalse(result)
+
+    def test_circle_max_radius_1(self):
+        result = Shapes.Circle.determine_max_radius(0, 1, 1)
+        self.assertEqual(0.5, result)
+
+    def test_circle_max_radius_2(self):
+        result = Shapes.Circle.determine_max_radius(0, 2, 1)
+        self.assertEqual(0.25, result)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(ShapesTests)
