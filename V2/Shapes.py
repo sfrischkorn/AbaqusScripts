@@ -55,10 +55,9 @@ class Shape(object):
     def Orientation():
         pass
 
-    def GenerateSketch():
-        #s.EllipseByCenterPerimeter(center=(0.0, 0.0), axisPoint1=(15.0, 0.0), axisPoint2=(0.0, 2.5)) -> this gives long axis 15, short 2.5
+    def GenerateSketch(self):
         pass
-
+    
 
 class Ellipse(Shape):
     """
@@ -68,12 +67,22 @@ class Ellipse(Shape):
     short_axis = 0
     long_axis = 0
 
-    def __init__(self, short_axis=0.0, long_axis=0.0):
+    def __init__(self, centre=(0,0), short_axis=0.0, long_axis=0.0):
+        self.centre = centre
         self.short_axis = short_axis
         self.long_axis = long_axis
 
     def Area(self):
         return math.pi * self.short_axis * self.long_axis
+
+    def GenerateSketch(self):
+        commands = []
+        commands.append("t = p.MakeSketchTransform(sketchPlane=f[0], sketchPlaneSide=SIDE1, origin=({0}, {1}, 0.0))".format(self.centre[0], self.centre[1]))
+        commands.append("s = myModel.ConstrainedSketch(name='__profile__', sheetSize=20.0, transform=t)")
+        commands.append("s.setPrimaryObject(option=SUPERIMPOSE)")
+        commands.append("s.EllipseByCenterPerimeter(center=(0.0, 0.0), axisPoint1=({0}, 0.0), axisPoint2=(0.0, {1}))".format(self.long_axis, self.short_axis)) # -> this gives long axis 15, short 2.5
+
+        return commands
 
     class Factory:
         def create(self, **kwargs):
@@ -85,7 +94,7 @@ class Circle(Ellipse):
     A circle is just an ellipse with equal axes, so it extends ellipse
     """
 
-    def __init__(self, centre=0.0, radius=0.0):
+    def __init__(self, centre=(0, 0), radius=0.0):
         self.centre = centre
         self.radius = radius
 

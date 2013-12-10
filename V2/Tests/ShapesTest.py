@@ -4,6 +4,8 @@ import sys
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parentdir)
 import Shapes
+import SizeDistributions
+import Locations
 
 from math import sqrt
 
@@ -84,6 +86,18 @@ class ShapesTests(unittest.TestCase):
     def test_circle_max_radius_2(self):
         result = Shapes.Circle.determine_max_radius(0, 2, 1)
         self.assertEqual(0.25, result)
+
+    def test_generate_ellipse_commands(self):
+        INCLUSION_SIZE = 0.25
+        LOCATION = (0.5, 0.5)
+
+        circle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=LOCATION, radius=INCLUSION_SIZE)
+
+        commands = circle.GenerateSketch()
+
+        self.assertEqual(4, len(commands))
+        self.assertEqual("t = p.MakeSketchTransform(sketchPlane=f[0], sketchPlaneSide=SIDE1, origin=(0.5, 0.5, 0.0))", commands[0])
+        self.assertEqual("s.EllipseByCenterPerimeter(center=(0.0, 0.0), axisPoint1=(0.25, 0.0), axisPoint2=(0.0, 0.25))", commands[3])
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(ShapesTests)
