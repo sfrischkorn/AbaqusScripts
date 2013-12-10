@@ -56,6 +56,15 @@ def GenerateModel():
     myModel.parts[partName].BaseShell(sketch=mdb.models[modelName].sketches['__profile__'])
     del myModel.sketches['__profile__']
 
+
+    #assign materials
+    myModel.Material(name=materialName)
+    myModel.materials[materialName].Elastic(table=((1000000000.0, 0.3), ))
+    myModel.HomogeneousSolidSection(material=materialName, name=mySectionName, thickness=None)
+
+
+
+
     p = myModel.parts[partName]
     f = p.faces
 
@@ -65,14 +74,13 @@ def GenerateModel():
 
     NUM_INCLUSIONS = 2
     INCLUSION_SIZE = 0.2
-    LOCATION = [(0.25, 0.25), (0.35, 0.35)] 
+    LOCATION = [(0.25, 0.25), (0.75, 0.75)] 
 
     dist = SizeDistributions.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
     loc = Locations.FixedLocation(LOCATION)
-
     circles = GenerateCircles(NUM_INCLUSIONS, dist, loc)
 
-
+    i = 0
     for circle in circles:
         commands = circle.GenerateSketch()
 
@@ -83,24 +91,26 @@ def GenerateModel():
         p.PartitionFaceBySketch(faces=inclusionFaces, sketch=s)
 
         del s
+        i += 1
 
-    #assign materials
-    myModel.Material(name=materialName)
-    myModel.materials[materialName].Elastic(table=((1000000000.0, 0.3), ))
-    myModel.HomogeneousSolidSection(material=materialName, name=mySectionName, thickness=None)
+        setname = inclusionSetName + str(i)
+        sectionname = inclusionSectionName + str(i)
+        materialname = inclusionMaterialName + str(i)
 
-    myModel.Material(name=inclusionMaterialName)
-    myModel.materials[inclusionMaterialName].Elastic(table=((2000000000.0, 0.4), ))
-    myModel.HomogeneousSolidSection(material=inclusionMaterialName, name=inclusionSectionName, thickness=None)
+        # TODO: find better way to assign materials. need to be passed in or something
+        myModel.Material(name=materialname)
+        myModel.materials[materialname].Elastic(table=((2000000000.0, 0.4), ))
+        myModel.HomogeneousSolidSection(material=materialname, name=sectionname, thickness=None)
+
+        #inclusionFaces = f.getSequenceFromMask(mask=('[#1 ]', ), )
+        inclusionFaces = f.findAt(((circle.centre[0], circle.centre[1], 0.0), ))
+        inclusionRegion = p.Set(faces=inclusionFaces, name=setname)
+        p.SectionAssignment(region=inclusionRegion, sectionName=sectionname, offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
+        p.setMeshControls(regions=inclusionFaces, elemShape=TRI)
+
 
     #Create sets and sections
-    #session.viewports['Viewport: 1'].setValues(displayedObject=p1)
-
-    inclusionFaces = f.getSequenceFromMask(mask=('[#1 ]', ), )
-    inclusionRegion = p.Set(faces=inclusionFaces, name=inclusionSetName)
-    p.SectionAssignment(region=inclusionRegion, sectionName=inclusionSectionName, offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
-
-    matrixFaces = f.getSequenceFromMask(mask=('[#2 ]', ), )
+    matrixFaces = f.findAt(((0.001, 0.001, 0.0), )) # TODO: find a way to find a spot that isn't taken with inclusions
     matrixRegion = p.Set(faces=matrixFaces, name=setName)
     p.SectionAssignment(region=matrixRegion, sectionName=mySectionName, offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
 
@@ -110,9 +120,7 @@ def GenerateModel():
     assembly.DatumCsysByDefault(CARTESIAN)
     assembly.Instance(name=assemblyName, part=p, dependent=ON)
 
-    regionsToMesh = matrixRegion, inclusionRegion,
-    #create the mesh
-    p.setMeshControls(regions=inclusionFaces, elemShape=TRI)
+    #Mesh the part
     p.seedPart(size=0.1)
     p.generateMesh()
 
