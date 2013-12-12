@@ -17,11 +17,11 @@ from sketch import *
 from visualization import *
 from connectorBehavior import *
 
-def GenerateCircles(num_inclusions, distribution, locations, max_attempts=10000):
+def _GenerateCircles(num_inclusions, distribution, locations, max_attempts=10000):
     if type(locations) == Locations.FixedLocation:
         if num_inclusions <> len(locations.locations) <> len(distribution.distribution):
-                raise IndexError("The number of inclusions and length of the locations must be equal")    
-    
+                raise IndexError("The number of inclusions and length of the locations must be equal")
+
     circles = []
 
     # loop through num inclusions
@@ -32,7 +32,7 @@ def GenerateCircles(num_inclusions, distribution, locations, max_attempts=10000)
 
     return circles
 
-def GenerateModel():
+def GenerateModel(inclusions):
     #Define constants
     modelName = 'Single Inclusion'
     partName = 'Part-1'
@@ -63,31 +63,19 @@ def GenerateModel():
     myModel.HomogeneousSolidSection(material=materialName, name=mySectionName, thickness=None)
 
 
-
-
     p = myModel.parts[partName]
     f = p.faces
 
-    #NUM_INCLUSIONS = 1
-    #INCLUSION_SIZE = 0.25
-    #LOCATION = [(0.5, 0.5)] 
-
-    NUM_INCLUSIONS = 2
-    INCLUSION_SIZE = 0.2
-    LOCATION = [(0.25, 0.25), (0.75, 0.75)] 
-
-    dist = SizeDistributions.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
-    loc = Locations.FixedLocation(LOCATION)
-    circles = GenerateCircles(NUM_INCLUSIONS, dist, loc)
 
     i = 0
-    for circle in circles:
-        commands = circle.GenerateSketch()
+    for inclusion in inclusions:
+        commands = inclusion.GenerateSketch()
 
         for command in commands:
             exec(command)
-        
-        inclusionFaces = f.getSequenceFromMask(mask=('[#1 ]', ), )
+
+        #inclusionFaces = f.getSequenceFromMask(mask=('[#1 ]', ), )
+        inclusionFaces = f.findAt(((inclusion.centre[0], inclusion.centre[1], 0.0), ))
         p.PartitionFaceBySketch(faces=inclusionFaces, sketch=s)
 
         del s
@@ -103,7 +91,7 @@ def GenerateModel():
         myModel.HomogeneousSolidSection(material=materialname, name=sectionname, thickness=None)
 
         #inclusionFaces = f.getSequenceFromMask(mask=('[#1 ]', ), )
-        inclusionFaces = f.findAt(((circle.centre[0], circle.centre[1], 0.0), ))
+        #inclusionFaces = f.findAt(((inclusion.centre[0], inclusion.centre[1], 0.0), ))
         inclusionRegion = p.Set(faces=inclusionFaces, name=setname)
         p.SectionAssignment(region=inclusionRegion, sectionName=sectionname, offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
         p.setMeshControls(regions=inclusionFaces, elemShape=TRI)
@@ -129,9 +117,19 @@ def GenerateModel():
 
 
 
+#NUM_INCLUSIONS = 1
+#INCLUSION_SIZE = 0.25
+#LOCATION = [(0.5, 0.5)]
 
+NUM_INCLUSIONS = 2
+INCLUSION_SIZE = 0.2
+LOCATION = [(0.25, 0.25), (0.75, 0.75)]
 
-GenerateModel()
+dist = SizeDistributions.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
+loc = Locations.FixedLocation(LOCATION)
+circles = _GenerateCircles(NUM_INCLUSIONS, distribution, location)
+
+GenerateModel(circles)
 
 
 
@@ -149,7 +147,7 @@ GenerateModel()
 
 #NUM_INCLUSIONS = 1
 #INCLUSION_SIZE = 0.25
-#LOCATION = [(0.5, 0.5)] 
+#LOCATION = [(0.5, 0.5)]
 
 #dist = SizeDistributions.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
 #loc = Locations.FixedLocation(LOCATION)
@@ -160,7 +158,7 @@ GenerateModel()
 
 #NUM_INCLUSIONS = 2
 #INCLUSION_SIZE = 0.2
-#LOCATION = [(0.25, 0.25), (0.35, 0.35)] 
+#LOCATION = [(0.25, 0.25), (0.35, 0.35)]
 
 #dist = SizeDistributions.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
 #loc = Locations.FixedLocation(LOCATION)
@@ -170,7 +168,7 @@ GenerateModel()
 
 
 #NUM_INCLUSIONS = 2
-#BUFFER = 0.01 
+#BUFFER = 0.01
 #SCALE = 0.8
 #INCLUSION_SIZE = 0.2
 
@@ -181,7 +179,7 @@ GenerateModel()
 
 
 #NUM_INCLUSIONS = 4
-#BUFFER = 0.01 
+#BUFFER = 0.01
 #SCALE = 0.8
 #INCLUSION_SIZE = 0.2
 
