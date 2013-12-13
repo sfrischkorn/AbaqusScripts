@@ -7,7 +7,7 @@ class MaterialFactory:
     """
     Factory class to encapsulate creation of materials. Using **kwargs lets you
     pass values to the material constructors,
-    eg. for an Elastic material createMaterial(materials.ELASTIC,
+    eg. for an Elastic material createMaterial(materials.ELASTIC, name="mat",
         youngs_modulus = 20000, poissons_ratio = 2)
     """
 
