@@ -1,6 +1,7 @@
 import Locations
 import SizeDistributions
 import Shapes
+import Materials
 
 
 
@@ -17,7 +18,7 @@ from sketch import *
 from visualization import *
 from connectorBehavior import *
 
-def _GenerateCircles(num_inclusions, distribution, locations, max_attempts=10000):
+def _GenerateCircles(num_inclusions, distribution, locations, materials, max_attempts=10000):
     if type(locations) == Locations.FixedLocation:
         if num_inclusions <> len(locations.locations) <> len(distribution.distribution):
                 raise IndexError("The number of inclusions and length of the locations must be equal")
@@ -26,18 +27,21 @@ def _GenerateCircles(num_inclusions, distribution, locations, max_attempts=10000
 
     # loop through num inclusions
     for i in range(num_inclusions):
-        inclusion = locations.GenerateInclusion(distribution, circles)
+        inclusion = locations.GenerateInclusion(distribution, materials[i], circles)
         if inclusion:
             circles.append(inclusion)
 
     return circles
 
-def GenerateModel(inclusions):
+def GenerateModel(inclusions, matrix_material):
+
+    assert len(inclusions) == len(inclusion_materials), 'The number of materials must equal the number of inclusions'
+
     #Define constants
     modelName = 'Single Inclusion'
     partName = 'Part-1'
-    materialName = 'Matrix'
-    mySectionName = 'Matrix'
+    matrix_material_name = 'Matrix'
+    matrix_section_name = 'Matrix'
     setName = 'Matrix'
 
     inclusionMaterialName = 'Inclusion'
@@ -57,10 +61,12 @@ def GenerateModel(inclusions):
     del myModel.sketches['__profile__']
 
 
-    #assign materials
-    myModel.Material(name=materialName)
-    myModel.materials[materialName].Elastic(table=((1000000000.0, 0.3), ))
-    myModel.HomogeneousSolidSection(material=materialName, name=mySectionName, thickness=None)
+    #assign matrix materials
+    #myModel.Material(name=materialName)
+    #myModel.materials[materialName].Elastic(table=((1000000000.0, 0.3), ))
+    #myModel.HomogeneousSolidSection(material=materialName, name=mySectionName, thickness=None)
+    for command in matrix_material.generate_material_commands("myModel", matrix_section_name):
+        exec(command)
 
 
     p = myModel.parts[partName]
@@ -83,12 +89,14 @@ def GenerateModel(inclusions):
 
         setname = inclusionSetName + str(i)
         sectionname = inclusionSectionName + str(i)
-        materialname = inclusionMaterialName + str(i)
+        #materialname = inclusionMaterialName + str(i)
 
         # TODO: find better way to assign materials. need to be passed in or something
-        myModel.Material(name=materialname)
-        myModel.materials[materialname].Elastic(table=((2000000000.0, 0.4), ))
-        myModel.HomogeneousSolidSection(material=materialname, name=sectionname, thickness=None)
+        #myModel.Material(name=materialname)
+        #myModel.materials[materialname].Elastic(table=((2000000000.0, 0.4), ))
+        #myModel.HomogeneousSolidSection(material=materialname, name=sectionname, thickness=None)
+        for material_command in inclusion.material.generate_material_commands("myModel", sectionname):
+            exec(command)
 
         #inclusionFaces = f.getSequenceFromMask(mask=('[#1 ]', ), )
         #inclusionFaces = f.findAt(((inclusion.centre[0], inclusion.centre[1], 0.0), ))
@@ -100,7 +108,7 @@ def GenerateModel(inclusions):
     #Create sets and sections
     matrixFaces = f.findAt(((0.001, 0.001, 0.0), )) # TODO: find a way to find a spot that isn't taken with inclusions
     matrixRegion = p.Set(faces=matrixFaces, name=setName)
-    p.SectionAssignment(region=matrixRegion, sectionName=mySectionName, offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
+    p.SectionAssignment(region=matrixRegion, sectionName=matrix_section_name, offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
 
 
     #Create the assembly
@@ -125,11 +133,21 @@ NUM_INCLUSIONS = 2
 INCLUSION_SIZE = 0.2
 LOCATION = [(0.25, 0.25), (0.75, 0.75)]
 
+#Create the material for the matrix
+matrix_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, 'Matrix', 1000, 3.0) 
+
+#Define a material for the inclusions
+inclusion_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, 'Inclusion', 2000, 2.0)
+#This is going to use the same material for all inclusions
+inclusion_materials = [inclusion_material, inclusion_material]
+
+#Create the distribution and location to use, and generate the inclusions
 dist = SizeDistributions.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
 loc = Locations.FixedLocation(LOCATION)
-circles = _GenerateCircles(NUM_INCLUSIONS, distribution, location)
+circles = _GenerateCircles(NUM_INCLUSIONS, distribution, location, inclusion_materials)
 
-GenerateModel(circles)
+#Generate the models in abaqus
+GenerateModel(circles, matrix_material)
 
 
 

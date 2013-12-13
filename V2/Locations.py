@@ -127,7 +127,7 @@ class FixedLocation(Location):
         #This list contains the number of sites in each row
         lattice = _LayoutLatticeDimensions(dimensions, num_inclusions)
 
-    def GenerateInclusion(self, distribution, existing_circles, max_attempts=None):
+    def GenerateInclusion(self, distribution, material, existing_circles, max_attempts=None):
         #Pick a size from the distribution
         size = distribution.retrieve_sample()
 
@@ -135,7 +135,7 @@ class FixedLocation(Location):
         location = self.retrieve_location()
 
         #Generate the shape object
-        myCircle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=location, radius=size)
+        myCircle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=material,centre=location, radius=size)
 
         #Test that it fits there. If not, find a new location
         if (not myCircle.check_intersect(existing_circles)):
@@ -210,7 +210,7 @@ class RandomLocation(Location):
             y = random.random()
 
             centre = x, y
-            newcircle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=centre, radius=radius)
+            newcircle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=None, centre=centre, radius=radius)
 
             location_ok = newcircle.is_location_inside_square(self.buffersize)
             attempts += 1

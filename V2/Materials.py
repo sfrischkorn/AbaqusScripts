@@ -1,3 +1,8 @@
+def enum(**enums):
+    return type('Enum', (), enums)
+
+materials = enum(ELASTIC='Elastic')
+
 class MaterialFactory:
     """
     Factory class to encapsulate creation of materials. Using **kwargs lets you
@@ -24,6 +29,9 @@ class MaterialFactory:
 class Material(object):
     name = ""
 
+    def __init__(self, name):
+        self.name = name
+
     def generate_material(self, model_name):
         return "{0}.Material(name={1})".format(model_name, self.name)
 
@@ -35,7 +43,8 @@ class Elastic(Material):
     poissons_ratio = 0.0
 
     def __init__(self, name, youngs_modulus, poissons_ratio):
-        self.name = name
+        super(Elastic, self).__init__(name)
+
         self.youngs_modulus = youngs_modulus
         self.poissons_ratio = poissons_ratio
 

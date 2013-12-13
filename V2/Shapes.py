@@ -1,13 +1,14 @@
 from __future__ import division
 import math
+import Materials
 from random import uniform
+
 
 """
 This module contains the classes defining the shapes of inclusions, as well
 as a factory to create them. Creation of an object is:
 myCircle = ShapeFactory.createShape(shapes.CIRCLE)
 """
-
 
 def enum(**enums):
     return type('Enum', (), enums)
@@ -48,6 +49,12 @@ class Shape(object):
     """
 
     centre = ()
+    material = None
+
+
+    def __init__(self, material, centre):
+        self.centre = centre
+        self.material = material
 
     def Area(self):
         pass
@@ -67,8 +74,8 @@ class Ellipse(Shape):
     short_axis = 0
     long_axis = 0
 
-    def __init__(self, centre=(0,0), short_axis=0.0, long_axis=0.0):
-        self.centre = centre
+    def __init__(self, material, centre=(0,0), short_axis=0.0, long_axis=0.0):
+        super(Ellipse, self).__init__(material, centre)
         self.short_axis = short_axis
         self.long_axis = long_axis
 
@@ -94,9 +101,10 @@ class Circle(Ellipse):
     A circle is just an ellipse with equal axes, so it extends ellipse
     """
 
-    def __init__(self, centre=(0, 0), radius=0.0):
-        self.centre = centre
-        self.radius = radius
+    def __init__(self, material, centre=(0, 0), radius=0.0):
+        super(Circle, self).__init__(material, centre, radius, radius)
+        #self.centre = centre
+        #self.radius = radius
 
     @property
     def radius(self):
