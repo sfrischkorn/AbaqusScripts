@@ -5,11 +5,11 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{495d0017-8559-4bbe-8d4a-ec09f2b75050}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>Tests\MaterialsTest.py</StartupFile>
+    <StartupFile>Tests\LocationsTest.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <InterpreterId>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</InterpreterId>
+    <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -18,6 +18,8 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Compile Include="Abaqus.py" />
+    <Compile Include="DeformModel.py" />
     <Compile Include="Locations.py" />
     <Compile Include="Materials.py" />
     <Compile Include="Tests\LocationsTest.py" />

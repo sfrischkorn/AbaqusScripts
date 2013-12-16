@@ -5,7 +5,11 @@ parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parentdir)
 import Locations
 
+import Materials
 import Shapes
+import SizeDistributions
+
+import turtle
 
 class LocationsTests(unittest.TestCase):
     def creation_helper(self):
@@ -161,6 +165,73 @@ class LocationsTests(unittest.TestCase):
         self.assertTrue((0.275, 0.725) in result)
         self.assertTrue((0.725, 0.275) in result)
         self.assertTrue((0.725, 0.725) in result)
+
+    def test_lattice_constructor(self):
+        loc = Locations.FixedLocation(generate_lattice=True, num_locations=4)
+        self.assertEqual(4, len(loc.locations))
+        self.assertTrue((0.25, 0.25) in loc.locations)
+        self.assertTrue((0.25, 0.75) in loc.locations)
+        self.assertTrue((0.75, 0.25) in loc.locations)
+        self.assertTrue((0.75, 0.75) in loc.locations)
+
+    def test_generate_circles(self):
+        NUM_INCLUSIONS = 4
+        INCLUSION_SIZE = 0.2
+
+        #Define a material for the inclusions
+        inclusion_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Inclusion', youngs_modulus=2000, poissons_ratio=0.3)
+        #This is going to use the same material for all inclusions
+        inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
+
+        #Create the distribution and location to use, and generate the inclusions
+        dist = SizeDistributions.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
+        loc = Locations.FixedLocation(generate_lattice=True, num_locations=4)
+        circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials)
+
+    @staticmethod
+    def drawCircle (centerpoint, radius):
+        (x,y) = centerpoint
+        turtle.up()
+        turtle.setpos(x*1000-500 + radius * 1000,y*1000-500)
+
+        # turtle.right(3) this is kind of pointless
+        turtle.setheading(90)
+        turtle.down()
+        turtle.circle(radius*1000)
+
+
+    def test_generate_circles_10_visual(self):
+        NUM_INCLUSIONS = 10
+        INCLUSION_SIZE = 0.05
+
+        #Define a material for the inclusions
+        inclusion_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Inclusion', youngs_modulus=2000, poissons_ratio=0.3)
+        #This is going to use the same material for all inclusions
+        inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
+
+        #Create the distribution and location to use, and generate the inclusions
+        dist = SizeDistributions.Random(NUM_INCLUSIONS, upper=0.4)
+        loc = Locations.RandomLocation(NUM_INCLUSIONS, buffersize=0, scale_factor=1)
+        circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials)
+
+        turtle.setup(1100, 1100)
+        turtle.screensize(canvwidth=1100, canvheight=1100)
+        turtle.up()
+        turtle.goto(-500, -500)
+        turtle.setheading(90)
+        turtle.down()
+        turtle.forward(1000)
+        turtle.right(90)
+        turtle.forward(1000)
+        turtle.right(90)
+        turtle.forward(1000)
+        turtle.right(90)
+        turtle.forward(1000)
+
+        print 'Generated {0} circles'.format(len(circles))
+
+        for circle in circles:
+            LocationsTests.drawCircle(circle.centre, circle.radius)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(LocationsTests)

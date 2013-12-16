@@ -1,3 +1,9 @@
+"""
+Define materials for abaqus. To create a new material, define the class for it, and add an entry to the materials enum with the value
+set to the name of the material class. The Elastic class provides a good template to follow. The youngs_modulus and poissons_ratio would need 
+to be changed for the variables of the new material.
+"""
+
 def enum(**enums):
     return type('Enum', (), enums)
 
@@ -38,6 +44,7 @@ class Material(object):
     def generate_section_command(self, model_name, section_name):
         return "{0}.HomogeneousSolidSection(material='{1}', name='{2}', thickness=None)".format(model_name, self.name, section_name)
 
+
 class Elastic(Material):
     youngs_modulus = 0.0
     poissons_ratio = 0.0
@@ -57,6 +64,7 @@ class Elastic(Material):
         commands.append(parent.generate_section_command(model_name, section_name))
 
         return commands
+
 
     class Factory:
         def create(self, **kwargs):

@@ -2,6 +2,7 @@ from __future__ import division
 import numpy
 import random
 import Shapes
+import SizeDistributions
 from math import ceil, sqrt
 from types import IntType
 
@@ -12,10 +13,26 @@ class Location(object):
     def retrieve_location(self):
         return self.locations.pop(0)
 
+    @staticmethod
+    def GenerateInclusions(num_inclusions, distribution, locations, materials, max_attempts=10000):
+        if type(locations) == FixedLocation:
+            assert num_inclusions == len(locations.locations) == len(distribution.distribution) == len(materials), \
+            "The number of inclusions, number of locations, number of sizes, and number of materials must be equal"
+
+        inclusions = []
+
+        #loop through the number of inclusions
+        for i in range(num_inclusions):
+            inclusion = locations.GenerateInclusion(distribution, materials[i], inclusions, max_attempts)
+            if inclusion:
+                inclusions.append(inclusion)
+
+        return inclusions
+
 
 class FixedLocation(Location):
     def __init__(self, locations=None, random_order=False,
-                 generate_lattice=False):
+                 generate_lattice=False, num_locations=None, buffersize=0, scalefactor=1):
         """
         Create a new fixed location collection. Note that if the locations
         are specified by the caller, it is the caller's responsibility to
@@ -24,16 +41,37 @@ class FixedLocation(Location):
                     in a unit square
         random_order - whether to use the list in the supplied order, or
                        randomise it
+        generate_lattice - whether to generate a regular lattice of 
+                           locations. Both locations and random_order will 
+                           be ignored if this is set to True
+        num_locations - the number of sites to generate in a random lattice. 
+                        Only needs to be set if generate_lattice is True
+        buffersize - The buffer space to leave between circles and the edge of
+                     The container, as well as between circles. Only needs to
+                     be set if generate_lattice is True
+        scalefactor - a factor to multiply the final radius by. It is provided
+                      to allow for easier fitting of circles, since if the
+                      maximum radius is used, it can be difficult to fit all
+                      the circles in if the first is in a bad location. 0.5
+                      will halve the radius, 2 will double it. Only needs to
+                      be set if generate_lattice is True.
         """
-        # Assert that the locations provided are within a unit square
-        for item in locations:
-            assert(0.0 <= item[0] <= 1.0 and 0.0 <= item[1] <= 1.0)
+        if generate_lattice:
+            assert num_locations is not None, 'The number of locations must be specified to generate a lattice'
 
-        #this uses list() to create a copy of the list rather than a reference
-        self.locations = list(locations)
+            self.GenerateRegularLattice(num_locations, buffersize, scalefactor)
 
-        if random_order:
-            random.shuffle(self.locations)
+        else:
+            # Assert that the locations provided are within a unit square
+            for item in locations:
+                assert(0.0 <= item[0] <= 1.0 and 0.0 <= item[1] <= 1.0)
+
+            #this uses list() to create a copy of the list rather than a reference
+            self.locations = list(locations)
+
+            if random_order:
+                random.shuffle(self.locations)
+
 
     @staticmethod
     def _DetermineRowLocations(num_locations_left, lattice, rows_to_fill):
@@ -106,7 +144,7 @@ class FixedLocation(Location):
 
         return locations
 
-    def GenerateRegularLattice(self, num_inclusions):
+    def GenerateRegularLattice(self, num_inclusions, buffersize, scalefactor):
         """
         Generate the locations of the inclusions by placing them in a regular
         lattice pattern. Any locations currently defined will be overwritten
@@ -119,13 +157,15 @@ class FixedLocation(Location):
 
         if square_root.is_integer():
             #It is a whole number, so generate a square_root x square_root grid
-            dimensions = (square_root, square_root)
+            dimensions = (int(square_root), int(square_root))
         else:
             #Not a whole number, some some rows will not be full
-            dimensions = (ceil(square_root), ceil(square_root))
+            dimensions = (int(ceil(square_root)), int(ceil(square_root)))
 
         #This list contains the number of sites in each row
-        lattice = _LayoutLatticeDimensions(dimensions, num_inclusions)
+        lattice = FixedLocation._LayoutLatticeDimensions(dimensions, num_inclusions)
+
+        self.locations = FixedLocation._DetermineLatticeLocations(lattice, buffersize, scalefactor)
 
     def GenerateInclusion(self, distribution, material, existing_circles, max_attempts=None):
         #Pick a size from the distribution
@@ -222,7 +262,7 @@ class RandomLocation(Location):
         #Failed to find a location
         return None
 
-    def GenerateInclusion(self, distribution, existing_circles, max_attempts=10000):
+    def GenerateInclusion(self, distribution, material, existing_circles, max_attempts=10000):
         attempts = 0
 
         size = distribution.retrieve_sample()
@@ -230,16 +270,16 @@ class RandomLocation(Location):
         while True:
             if attempts == max_attempts:
                 # Could not find a location to fit the circle, so give up
-                return circles
+                return None
 
             #Find the location for it
             location = self.retrieve_location(Shapes.shapes.CIRCLE, radius=size)
             if not location:
                 #could not find a location to fit an object of this size, so skip it
-                break
+                return None
 
             #Generate the shape object
-            myCircle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, centre=location, radius=size)
+            myCircle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=material, centre=location, radius=size)
 
             #Test that it fits there. If not, find a new location
             if (not myCircle.check_intersect(existing_circles)):
