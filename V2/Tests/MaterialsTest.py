@@ -28,6 +28,8 @@ class MaterialsTests(unittest.TestCase):
         commands = mat.generate_material_commands("model", "section")
         self.assertEqual(3, len(commands))
 
+        self.assertEqual("model.materials['mat'].Elastic(table=((20000, 2), ))", commands[1])
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(MaterialsTests)
     unittest.TextTestRunner(verbosity=2).run(suite)

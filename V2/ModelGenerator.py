@@ -62,9 +62,6 @@ def GenerateModel(inclusions, matrix_material):
 
 
     #assign matrix materials
-    #myModel.Material(name=materialName)
-    #myModel.materials[materialName].Elastic(table=((1000000000.0, 0.3), ))
-    #myModel.HomogeneousSolidSection(material=materialName, name=mySectionName, thickness=None)
     for command in matrix_material.generate_material_commands("myModel", matrix_section_name):
         exec(command)
 
@@ -80,7 +77,6 @@ def GenerateModel(inclusions, matrix_material):
         for command in commands:
             exec(command)
 
-        #inclusionFaces = f.getSequenceFromMask(mask=('[#1 ]', ), )
         inclusionFaces = f.findAt(((inclusion.centre[0], inclusion.centre[1], 0.0), ))
         p.PartitionFaceBySketch(faces=inclusionFaces, sketch=s)
 
@@ -89,17 +85,11 @@ def GenerateModel(inclusions, matrix_material):
 
         setname = inclusionSetName + str(i)
         sectionname = inclusionSectionName + str(i)
-        #materialname = inclusionMaterialName + str(i)
-
-        # TODO: find better way to assign materials. need to be passed in or something
-        #myModel.Material(name=materialname)
-        #myModel.materials[materialname].Elastic(table=((2000000000.0, 0.4), ))
-        #myModel.HomogeneousSolidSection(material=materialname, name=sectionname, thickness=None)
         for material_command in inclusion.material.generate_material_commands("myModel", sectionname):
-            exec(command)
+            exec(material_command)
 
-        #inclusionFaces = f.getSequenceFromMask(mask=('[#1 ]', ), )
-        #inclusionFaces = f.findAt(((inclusion.centre[0], inclusion.centre[1], 0.0), ))
+        #this is already assigned above, but it loses the definition and needs to be assigned again
+        inclusionFaces = f.findAt(((inclusion.centre[0], inclusion.centre[1], 0.0), ))
         inclusionRegion = p.Set(faces=inclusionFaces, name=setname)
         p.SectionAssignment(region=inclusionRegion, sectionName=sectionname, offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
         p.setMeshControls(regions=inclusionFaces, elemShape=TRI)
@@ -134,17 +124,17 @@ INCLUSION_SIZE = 0.2
 LOCATION = [(0.25, 0.25), (0.75, 0.75)]
 
 #Create the material for the matrix
-matrix_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, 'Matrix', 1000, 3.0) 
+matrix_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Matrix', youngs_modulus=1000, poissons_ratio=3.0) 
 
 #Define a material for the inclusions
-inclusion_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, 'Inclusion', 2000, 2.0)
+inclusion_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Inclusion', youngs_modulus=2000, poissons_ratio=2.0)
 #This is going to use the same material for all inclusions
 inclusion_materials = [inclusion_material, inclusion_material]
 
 #Create the distribution and location to use, and generate the inclusions
 dist = SizeDistributions.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
 loc = Locations.FixedLocation(LOCATION)
-circles = _GenerateCircles(NUM_INCLUSIONS, distribution, location, inclusion_materials)
+circles = _GenerateCircles(NUM_INCLUSIONS, dist, loc, inclusion_materials)
 
 #Generate the models in abaqus
 GenerateModel(circles, matrix_material)

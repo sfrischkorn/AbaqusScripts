@@ -33,10 +33,10 @@ class Material(object):
         self.name = name
 
     def generate_material(self, model_name):
-        return "{0}.Material(name={1})".format(model_name, self.name)
+        return "{0}.Material(name='{1}')".format(model_name, self.name)
 
     def generate_section_command(self, model_name, section_name):
-        return "{0}.HomogeneousSolidSection(material={1}, name={2}, thickness=None)".format(model_name, self.name, section_name)
+        return "{0}.HomogeneousSolidSection(material='{1}', name='{2}', thickness=None)".format(model_name, self.name, section_name)
 
 class Elastic(Material):
     youngs_modulus = 0.0
@@ -53,7 +53,7 @@ class Elastic(Material):
 
         commands = []
         commands.append(parent.generate_material(model_name))
-        commands.append("{0}.materials[{1}].Elastic(table=(({2}, {3}), )))".format(model_name, self.name, self.youngs_modulus, self.poissons_ratio))
+        commands.append("{0}.materials['{1}'].Elastic(table=(({2}, {3}), ))".format(model_name, self.name, self.youngs_modulus, self.poissons_ratio))
         commands.append(parent.generate_section_command(model_name, section_name))
 
         return commands
