@@ -180,11 +180,13 @@ class Circle(Ellipse):
                                          circle.centre[1])**2)
 
             if centre_distance > self.radius + circle.radius:
-                return False
+                continue
             elif centre_distance <= math.fabs(self.radius - circle.radius):
                 return True
             else:
                 return True
+
+        return False
 
     def __str__(self):
         return 'Centre: {}, radius: {}.'.format(self.centre, self.radius)

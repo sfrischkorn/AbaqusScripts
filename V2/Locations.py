@@ -1,5 +1,7 @@
 from __future__ import division
 import numpy
+import logging
+import sys
 import random
 import Shapes
 import SizeDistributions
@@ -14,7 +16,7 @@ class Location(object):
         return self.locations.pop(0)
 
     @staticmethod
-    def GenerateInclusions(num_inclusions, distribution, locations, materials, max_attempts=10000):
+    def GenerateInclusions(num_inclusions, distribution, locations, materials, max_attempts=10000, recurse_attempts=0, size=None):
         if type(locations) == FixedLocation:
             assert num_inclusions == len(locations.locations) == len(distribution.distribution) == len(materials), \
             "The number of inclusions, number of locations, number of sizes, and number of materials must be equal"
@@ -23,8 +25,9 @@ class Location(object):
 
         #loop through the number of inclusions
         for i in range(num_inclusions):
-            inclusion = locations.GenerateInclusion(distribution, materials[i], inclusions, max_attempts)
+            inclusion = locations.GenerateInclusion(distribution, materials[i], inclusions, max_attempts, recurse_attempts, size)
             if inclusion:
+                print 'Generated {0} inclusions'.format(len(inclusions))
                 inclusions.append(inclusion)
 
         return inclusions
@@ -167,7 +170,7 @@ class FixedLocation(Location):
 
         self.locations = FixedLocation._DetermineLatticeLocations(lattice, buffersize, scalefactor)
 
-    def GenerateInclusion(self, distribution, material, existing_circles, max_attempts=None):
+    def GenerateInclusion(self, distribution, material, existing_circles, max_attempts=None, recurse_attempts=0, size=None):
         #Pick a size from the distribution
         size = distribution.retrieve_sample()
 
@@ -191,6 +194,7 @@ class RandomLocation(Location):
     requested. It determines a maximum size to be used for the number of
     desired inclusions, and determines the locations based on that size.
     """
+    #logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     buffersize = 0.0
     num_locations = 0
     scale_factor = 1
@@ -259,30 +263,51 @@ class RandomLocation(Location):
                 return centre
                 break
 
+            if (attempts / 1000).is_integer():
+                logging.debug('{0} location attempts'.format(attempts))
+
         #Failed to find a location
         return None
 
-    def GenerateInclusion(self, distribution, material, existing_circles, max_attempts=10000):
+    def GenerateInclusion(self, distribution, material, existing_circles, max_attempts=10000, recurse_attempts=0, size=None):
+        """
+        recurse_attempts is the number of times it will halve the size and try again if it cannot find a 
+        solution in max_attempts
+        """
         attempts = 0
 
-        size = distribution.retrieve_sample()
-
+        if not size:
+            size = distribution.retrieve_sample()
+        logging.debug('Recurse level {0}, size {1}'.format(recurse_attempts, size))
         while True:
             if attempts == max_attempts:
-                # Could not find a location to fit the circle, so give up
-                return None
+                if recurse_attempts > 0:
+                    logging.debug('Attempts reached max attempts')
+                    return self.GenerateInclusion(distribution, material, existing_circles, max_attempts, recurse_attempts - 1, size / 2)
+                else:
+                    # Could not find a location to fit the circle, so give up
+                    logging.debug('Giving up')
+                    return None
 
             #Find the location for it
             location = self.retrieve_location(Shapes.shapes.CIRCLE, radius=size)
             if not location:
-                #could not find a location to fit an object of this size, so skip it
-                return None
+                if recurse_attempts > 0:
+                    logging.debug("Can't find location")
+                    return self.GenerateInclusion(distribution, material, existing_circles, max_attempts, recurse_attempts - 1, size / 2)
+                else:
+                    #could not find a location to fit an object of this size, so skip it
+                    logging.debug("Giving up, can't find location")
+                    return None
 
             #Generate the shape object
             myCircle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=material, centre=location, radius=size)
 
             #Test that it fits there. If not, find a new location
             if (not myCircle.check_intersect(existing_circles)):
+                logging.debug('Found a spot')
                 return myCircle
             else:
+                if (attempts / 1000).is_integer():
+                    logging.debug('{0} attempts'.format(attempts))
                 attempts += 1
