@@ -1,3 +1,16 @@
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+
 a = mdb.models['Single Inclusion'].rootAssembly
 
 e1 = a.instances['Single Inclusion'].edges
