@@ -199,21 +199,9 @@ class LocationsTests(unittest.TestCase):
         turtle.down()
         turtle.circle(radius*1000)
 
-
-    def test_generate_circles_10_visual(self):
-        NUM_INCLUSIONS = 5
-        #INCLUSION_SIZE = 0.05
-
-        #Define a material for the inclusions
-        inclusion_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Inclusion', youngs_modulus=2000, poissons_ratio=0.3)
-        #This is going to use the same material for all inclusions
-        inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
-
-        #Create the distribution and location to use, and generate the inclusions
-        dist = SizeDistributions.Random(NUM_INCLUSIONS)
-        loc = Locations.RandomLocation(NUM_INCLUSIONS, buffersize=0, scale_factor=1)
-        circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials, recurse_attempts=5)
-
+    @staticmethod
+    def setupboundingbox():
+        turtle.reset()
         turtle.setup(1100, 1100)
         turtle.screensize(canvwidth=1100, canvheight=1100)
         turtle.up()
@@ -227,6 +215,42 @@ class LocationsTests(unittest.TestCase):
         turtle.forward(1000)
         turtle.right(90)
         turtle.forward(1000)
+
+    def test_generate_circles_50_visual(self):
+        NUM_INCLUSIONS = 50
+
+        #Define a material for the inclusions
+        inclusion_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Inclusion', youngs_modulus=2000, poissons_ratio=0.3)
+        #This is going to use the same material for all inclusions
+        inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
+
+        #Create the distribution and location to use, and generate the inclusions
+        dist = SizeDistributions.Random(NUM_INCLUSIONS)
+        loc = Locations.RandomLocation(NUM_INCLUSIONS, buffersize=0, scale_factor=1)
+        circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials, recurse_attempts=5, max_attempts=50)
+
+        print 'Generated {0} circles'.format(len(circles))
+
+        #LocationsTests.setupboundingbox()
+        #for circle in circles:
+        #    LocationsTests.drawCircle(circle.centre, circle.radius)
+
+    def test_guassian_circles_visual(self):
+        NUM_INCLUSIONS = 10
+
+        #Define a material for the inclusions
+        inclusion_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Inclusion', youngs_modulus=2000, poissons_ratio=0.3)
+        #This is going to use the same material for all inclusions
+        inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
+
+        max_radius = Shapes.Circle.determine_max_radius(0, 4, 1)
+
+        #Create the distribution and location to use, and generate the inclusions
+        dist = SizeDistributions.Gaussian(max_radius / 2, max_radius / 2, NUM_INCLUSIONS)
+        loc = Locations.FixedLocation(generate_lattice=True, num_locations=NUM_INCLUSIONS, buffersize=0, scalefactor=1)
+        circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials, recurse_attempts=5, max_attempts=50)
+
+        LocationsTests.setupboundingbox()
 
         print 'Generated {0} circles'.format(len(circles))
 

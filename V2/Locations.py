@@ -16,7 +16,7 @@ class Location(object):
         return self.locations.pop(0)
 
     @staticmethod
-    def GenerateInclusions(num_inclusions, distribution, locations, materials, max_attempts=10000, recurse_attempts=0, size=None):
+    def GenerateInclusions(num_inclusions, distribution, locations, materials, max_attempts=1000, recurse_attempts=0, size=None):
         if type(locations) == FixedLocation:
             assert num_inclusions == len(locations.locations) == len(distribution.distribution) == len(materials), \
             "The number of inclusions, number of locations, number of sizes, and number of materials must be equal"
@@ -218,7 +218,7 @@ class RandomLocation(Location):
         self.num_locations = num_locations
         self.scale_factor = scale_factor
 
-    def retrieve_location(self, shape, maxattempts=10000, radius=None, equalsize=True):
+    def retrieve_location(self, shape, max_attempts=1000, radius=None, equalsize=True):
         """
         Return a new location to fit an inclusion. The location will be
         within the unit square matrix, but there is no guarantee that it will
@@ -243,7 +243,7 @@ class RandomLocation(Location):
                 raise
 
         while True:
-            if attempts == maxattempts:
+            if attempts == max_attempts:
                 # Could not find a location to fit the circle, so give up
                 return None
 
@@ -269,7 +269,7 @@ class RandomLocation(Location):
         #Failed to find a location
         return None
 
-    def GenerateInclusion(self, distribution, material, existing_circles, max_attempts=10000, recurse_attempts=0, size=None):
+    def GenerateInclusion(self, distribution, material, existing_circles, max_attempts=1000, recurse_attempts=0, size=None):
         """
         recurse_attempts is the number of times it will halve the size and try again if it cannot find a 
         solution in max_attempts
