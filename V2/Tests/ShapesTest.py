@@ -6,6 +6,7 @@ sys.path.insert(0, parentdir)
 import Shapes
 import SizeDistributions
 import Locations
+import Materials
 
 from math import sqrt
 
@@ -18,7 +19,7 @@ class ShapesTests(unittest.TestCase):
         radius = 0.31
 
         circle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=None, centre=centre, radius=radius)
-        
+
         distance = sqrt((circle.centre[0] - circle.perimiter_location()[0])**2 + (circle.centre[1] - circle.perimiter_location()[1])**2)
         self.assertEqual(round(distance, 5), radius)
 
@@ -26,7 +27,7 @@ class ShapesTests(unittest.TestCase):
         circle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=None, centre=(0.5, 0.5), radius=0.5)
         result = circle.is_location_inside_square()
         self.assertTrue(result)
-    
+
     def test_location_not_in_square(self):
         circle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=None, centre=(0.5, 0.5), radius=0.6)
         result = circle.is_location_inside_square()
@@ -71,7 +72,7 @@ class ShapesTests(unittest.TestCase):
 
     def test_circles_intersect3(self):
         centre1 = 0.25, 0.25
-        centre2 = 0.25, 0.25 
+        centre2 = 0.25, 0.25
         circle1 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=None, centre=centre1, radius=0.2)
         circle2 = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=None, centre=centre2, radius=0.1)
         result = circle1.check_intersect([circle2])
@@ -120,6 +121,23 @@ class ShapesTests(unittest.TestCase):
         self.assertEqual(4, len(commands))
         self.assertEqual("t = p.MakeSketchTransform(sketchPlane=f[0], sketchPlaneSide=SIDE1, origin=(0.5, 0.5, 0.0))", commands[0])
         self.assertEqual("s.EllipseByCenterPerimeter(center=(0.0, 0.0), axisPoint1=(0.25, 0.0), axisPoint2=(0.0, 0.25))", commands[3])
+
+    def test_export(self):
+        NUM_INCLUSIONS = 4
+        INCLUSION_SIZE = 0.2
+
+        #Define a material for the inclusions
+        inclusion_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Inclusion', youngs_modulus=2000, poissons_ratio=0.3)
+        inclusion_material2 = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Inclusion2', youngs_modulus=2500, poissons_ratio=0.2)
+        inclusion_materials = [inclusion_material, inclusion_material, inclusion_material2, inclusion_material]
+
+        #Create the distribution and location to use, and generate the inclusions
+        dist = SizeDistributions.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
+        loc = Locations.FixedLocation(generate_lattice=True, num_locations=4)
+        circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials)
+
+        output = Shapes.Shape.ExportInclusions(circles)
+        print output
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(ShapesTests)

@@ -2,7 +2,7 @@ from __future__ import division
 import math
 import Materials
 from random import uniform
-
+from itertools import groupby
 
 """
 This module contains the classes defining the shapes of inclusions, as well
@@ -64,7 +64,25 @@ class Shape(object):
 
     def GenerateSketch(self):
         pass
-    
+
+    @staticmethod
+    def ExportInclusions(shapes):
+        output_str = ''
+        materials_used = []
+        for key, group in groupby(sorted(shapes, key=lambda shape: shape.material), lambda x: x.material):
+            materials_used.append(key)
+            output_str += 'Material: {0}:\n'.format(key.name)
+            for shape in group:
+                output_str += '\t{0}\n'.format(shape)
+
+            output_str += '\n'
+
+        output_str += 'Materials:\n'
+        for mat in materials_used:
+            output_str += '\t{0}\n'.format(mat)
+
+        return output_str
+
 
 class Ellipse(Shape):
     """
@@ -189,7 +207,7 @@ class Circle(Ellipse):
         return False
 
     def __str__(self):
-        return 'Centre: {}, radius: {}.'.format(self.centre, self.radius)
+        return 'Centre: {0}, radius: {1}.'.format(self.centre, self.radius)
 
     class Factory:
         def create(self, **kwargs):
