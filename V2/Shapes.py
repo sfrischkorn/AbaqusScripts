@@ -66,7 +66,7 @@ class Shape(object):
         pass
 
     @staticmethod
-    def ExportInclusions(shapes):
+    def ExportInclusions(shapes, matrix_material):
         output_str = ''
         materials_used = []
         for key, group in groupby(sorted(shapes, key=lambda shape: shape.material), lambda x: x.material):
@@ -80,6 +80,9 @@ class Shape(object):
         output_str += 'Materials:\n'
         for mat in materials_used:
             output_str += '\t{0}\n'.format(mat)
+
+        output_str += '\nMatrix Material:\n'
+        output_str += '\t{0}'.format(matrix_material)
 
         return output_str
 
