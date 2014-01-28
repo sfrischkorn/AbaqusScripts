@@ -22,5 +22,10 @@ loc = Locations.RandomLocation(NUM_INCLUSIONS)
 
 circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials, recurse_attempts=10)
 
+#Output the details of the generated shapes. It will be located in the directory the script is run from(should eb the abaqus temp directory
+export_str = Shapes.Shape.ExportInclusions(circles, matrix_material)
+with open("geometry.txt", "w") as text_file:
+    text_file.write(export_str)
+
 #Generate the models in abaqus
 Abaqus.GenerateModel(circles, matrix_material)
