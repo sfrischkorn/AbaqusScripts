@@ -122,6 +122,33 @@ class ShapesTests(unittest.TestCase):
         self.assertEqual("t = p.MakeSketchTransform(sketchPlane=f[0], sketchPlaneSide=SIDE1, origin=(0.5, 0.5, 0.0))", commands[0])
         self.assertEqual("s.EllipseByCenterPerimeter(center=(0.0, 0.0), axisPoint1=(0.25, 0.0), axisPoint2=(0.0, 0.25))", commands[3])
 
+    def test_ellipses_intersect_true(self):
+        LOCATION = (0.5, 0.5)
+        LOCATION2 = (1, 1)
+        ellipse1 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION, short_axis=1, long_axis=2)
+        ellipse2 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION2, short_axis=1, long_axis=2)
+
+        result = ellipse1.check_intersect(ellipse2)
+        self.assertTrue(result)
+
+    def test_ellipses_intersect_false(self):
+        LOCATION = (0.5, 0.5)
+        LOCATION2 = (10.5, 10.5)
+        ellipse1 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION, short_axis=1, long_axis=2)
+        ellipse2 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION2, short_axis=1, long_axis=2)
+
+        result = ellipse1.check_intersect(ellipse2)
+        self.assertFalse(result)
+
+    def test_ellipses_intersect_contains_true(self):
+        LOCATION = (0.0, 0.0)
+        LOCATION2 = (0.0, 0.0)
+        ellipse1 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION, short_axis=10, long_axis=20)
+        ellipse2 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION2, short_axis=1, long_axis=2)
+
+        result = ellipse1.check_intersect(ellipse2)
+        self.assertTrue(result)
+
     def test_export(self):
         NUM_INCLUSIONS = 4
         INCLUSION_SIZE = 0.2

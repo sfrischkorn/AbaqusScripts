@@ -5,11 +5,11 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{495d0017-8559-4bbe-8d4a-ec09f2b75050}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>Tests\ShapesTest.py</StartupFile>
+    <StartupFile>Tests\LocationsTest.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
+    <InterpreterId>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -35,7 +35,28 @@
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
-    <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\2.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="C:\Envs\AbaqusEnv\">
+      <Id>{3a3f6b80-29f7-4e3d-bdad-325528bf41e7}</Id>
+      <BaseInterpreter>{5c507c2f-972f-4917-bb27-26f4f5a0c335}</BaseInterpreter>
+      <Version>2.7</Version>
+      <Description>AbaqusEnv (Anaconda)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <LibraryPath>Lib\</LibraryPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+    </Interpreter>
+    <Interpreter Include="C:\Envs\AbaqusScripts\">
+      <Id>{4d8c178a-092a-4f7a-abdc-09a3c6e52d47}</Id>
+      <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
+      <Version>2.7</Version>
+      <Description>AbaqusScripts (Python 2.7)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <LibraryPath>Lib\</LibraryPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>
