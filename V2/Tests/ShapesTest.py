@@ -20,7 +20,7 @@ class ShapesTests(unittest.TestCase):
 
         circle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=None, centre=centre, radius=radius)
 
-        distance = sqrt((circle.centre[0] - circle.perimiter_location()[0])**2 + (circle.centre[1] - circle.perimiter_location()[1])**2)
+        distance = sqrt((circle.centre[0] - circle.perimeter_location()[0])**2 + (circle.centre[1] - circle.perimeter_location()[1])**2)
         self.assertEqual(round(distance, 5), radius)
 
     def test_location_in_square(self):

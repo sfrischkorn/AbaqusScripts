@@ -132,7 +132,10 @@ class Ellipse(Shape):
         ellipse2 = Ellipse.__GenerateSymPyEllipse(ellipse)
 
         return len(intersection(ellipse1, ellipse2)) != 0 or ellipse1.encloses(ellipse2)
-       
+
+    def __str__(self):
+        return 'Centre: {0}, horizontal axis: {1}., vertical axis: {2}, angle: {3}'.\
+            format(self.centre, self.long_axis, self.short_axis, self.angle)
 
     class Factory:
         def create(self, **kwargs):
@@ -146,8 +149,6 @@ class Circle(Ellipse):
 
     def __init__(self, material, centre=(0, 0), radius=0.0):
         super(Circle, self).__init__(material, centre, radius, radius)
-        #self.centre = centre
-        #self.radius = radius
 
     @property
     def radius(self):
@@ -158,9 +159,9 @@ class Circle(Ellipse):
         self.short_axis = value
         self.long_axis = value
 
-    def perimiter_location(self):
+    def perimeter_location(self):
         """
-        Get a coordinate that lies on the perimiter of the circle
+        Get a coordinate that lies on the perimeter of the circle
         """
 
         return self.centre[0] + self.radius, self.centre[0]
