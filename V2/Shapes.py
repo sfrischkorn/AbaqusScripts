@@ -1,10 +1,11 @@
 from __future__ import division
 import math
-import numpy
 import Materials
 from itertools import groupby
 from random import uniform
-from shapely.geometry.polygon import LinearRing, Polygon
+from sympy import Ellipse as el
+from sympy.geometry import intersection
+
 
 """
 This module contains the classes defining the shapes of inclusions, as well
@@ -117,20 +118,9 @@ class Ellipse(Shape):
         return commands
 
     @staticmethod
-    def __ellipse_polyline(ellipses, n=100):
-        t = numpy.linspace(0, 2 * numpy.pi, n, endpoint=False)
-        st = numpy.sin(t)
-        ct = numpy.cos(t)
-        result = []
-        for x0, y0, a, b, angle in ellipses:
-            angle = numpy.deg2rad(angle)
-            sa = numpy.sin(angle)
-            ca = numpy.cos(angle)
-            p = numpy.empty((n, 2))
-            p[:, 0] = x0 + a * ca * ct - b * sa * st
-            p[:, 1] = y0 + a * sa * ct + b * ca * st
-            result.append(p)
-        return result
+    def __GenerateSymPyEllipse(ellipse):
+        return el(ellipse.centre, ellipse.long_axis, ellipse.short_axis)
+
 
     def check_intersect(self, ellipse):
         """
@@ -138,12 +128,10 @@ class Ellipse(Shape):
         Returns true if they intersect or one is within the other.
         Returns false if the ellipses do not touch
         """
-        ellipses = [(self.centre[0], self.centre[1], self.long_axis, self.short_axis, self.angle), (ellipse.centre[0], ellipse.centre[1], ellipse.long_axis, ellipse.short_axis, ellipse.angle)]
-        a, b = Ellipse.__ellipse_polyline(ellipses)
-        ea = Polygon(a)
-        eb = Polygon(b)
+        ellipse1 = Ellipse.__GenerateSymPyEllipse(self)
+        ellipse2 = Ellipse.__GenerateSymPyEllipse(ellipse)
 
-        return ea.intersects(eb) or ea.contains(eb) or eb.contains(ea)
+        return len(intersection(ellipse1, ellipse2)) != 0 or ellipse1.encloses(ellipse2)
        
 
     class Factory:
