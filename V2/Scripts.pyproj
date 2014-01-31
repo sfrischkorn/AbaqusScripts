@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{495d0017-8559-4bbe-8d4a-ec09f2b75050}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>Tests\LocationsTest.py</StartupFile>
+    <StartupFile>EllipseGenerator.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -20,6 +20,7 @@
   <ItemGroup>
     <Compile Include="Abaqus.py" />
     <Compile Include="DeformModel.py" />
+    <Compile Include="EllipseGenerator.py" />
     <Compile Include="Locations.py" />
     <Compile Include="Materials.py" />
     <Compile Include="Tests\LocationsTest.py" />
@@ -35,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
+    <InterpreterReference Include="{5c507c2f-972f-4917-bb27-26f4f5a0c335}\2.7" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="C:\Envs\AbaqusEnv\">

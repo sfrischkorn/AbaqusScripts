@@ -36,6 +36,10 @@ class ShapeFactory:
     def addFactory(shape, shapeFactory):
         ShapeFactory.factories.put[shape] = shapeFactory
 
+    def generateKwargs(shape):
+        if not shape in ShapeFactory.factories:
+            ShapeFactory.factories[shape] = eval(shape + '.Factory()')
+
     # A Template Method:
     def createShape(shape, **kwargs):
         if not shape in ShapeFactory.factories:
@@ -122,16 +126,22 @@ class Ellipse(Shape):
         return el(ellipse.centre, ellipse.long_axis, ellipse.short_axis)
 
 
-    def check_intersect(self, ellipse):
+    def check_intersect(self, ellipses):
         """
         Check if one ellipse either intersects with another ellipse, or is contained within it.
         Returns true if they intersect or one is within the other.
         Returns false if the ellipses do not touch
         """
+        
         ellipse1 = Ellipse.__GenerateSymPyEllipse(self)
-        ellipse2 = Ellipse.__GenerateSymPyEllipse(ellipse)
 
-        return len(intersection(ellipse1, ellipse2)) != 0 or ellipse1.encloses(ellipse2)
+        for ellipse in ellipses:
+            ellipse2 = Ellipse.__GenerateSymPyEllipse(ellipse)
+
+            if len(intersection(ellipse1, ellipse2)) != 0 or ellipse1.encloses(ellipse2) or ellipse2.encloses(ellipse1): 
+                return True
+
+        return False
 
     def __str__(self):
         return 'Centre: {0}, horizontal axis: {1}., vertical axis: {2}, angle: {3}'.\

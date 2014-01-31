@@ -13,18 +13,23 @@ class SizeDistribution(object):
         index = randint(0, len(self.distribution) - 1)
         sample = self.distribution[index]
         del self.distribution[index]
+
         return sample
 
+class ConstantEllipse(SizeDistribution):
+    def __init__(self, horizontal_axis, vertical_axis, num_inclusions):
+        for x in range(num_inclusions):
+            self.distribution.append(dict({'long_axis':horizontal_axis, 'short_axis':vertical_axis}))
 
-class Constant(SizeDistribution):
+class ConstantCircle(SizeDistribution):
     """
     Generates a distribution of constant size
     """
     def __init__(self, size, num_inclusions):
-        self.distribution = [size for x in range(num_inclusions)]
+        self.distribution = [dict(('radius', size) for x in range(num_inclusions))]
 
 
-class Random(SizeDistribution):
+class RandomCircle(SizeDistribution):
     """
     Generates a random distribution
     """
@@ -33,7 +38,7 @@ class Random(SizeDistribution):
                              x in range(num_inclusions)]
 
 
-class Gaussian(SizeDistribution):
+class GaussianCircle(SizeDistribution):
     """
     Generates a gaussian probability distribution, containing num_inclusions
     inclusions
@@ -43,7 +48,7 @@ class Gaussian(SizeDistribution):
                                                 num_inclusions).tolist()
 
 
-class LogNormal(SizeDistribution):
+class LogNormalCircle(SizeDistribution):
     """
     Generates a log-normal probability distribution, containing num_inclusions
     inclusions
@@ -53,7 +58,7 @@ class LogNormal(SizeDistribution):
                                                    num_inclusions).tolist()
 
 
-class Weibull(SizeDistribution):
+class WeibullCircle(SizeDistribution):
     """
     Generates a weibulll probability distribution, containing num_inclusions
     inclusions

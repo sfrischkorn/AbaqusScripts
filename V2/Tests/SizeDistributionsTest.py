@@ -14,15 +14,15 @@ class DistributionsTests(unittest.TestCase):
         self.assertIsNotNone(result)
 
     def test_retrieve_gaussian_sample(self):
-        guassianDistribution = SizeDistributions.Gaussian(0, 0.1, 1000)
+        guassianDistribution = SizeDistributions.GaussianCircle(0, 0.1, 1000)
         self.retrieve_sample_helper(guassianDistribution)
 
     def test_retrieve_lognormal_sample(self):
-        lognormalDistribution = SizeDistributions.LogNormal(0, 0.1, 1000)
+        lognormalDistribution = SizeDistributions.LogNormalCircle(0, 0.1, 1000)
         self.retrieve_sample_helper(lognormalDistribution)
 
     def test_retrieve_weibull_sample(self):
-        weibullDistribution = SizeDistributions.Weibull(0.1, 1000)
+        weibullDistribution = SizeDistributions.WeibullCircle(0.1, 1000)
         self.retrieve_sample_helper(weibullDistribution)
 
     def test_lognormal_Distribution(self):
@@ -31,7 +31,7 @@ class DistributionsTests(unittest.TestCase):
         """
         mean = 0.0
         stddev = 0.1
-        lognormalDistribution = SizeDistributions.LogNormal(mean, stddev, 1000)
+        lognormalDistribution = SizeDistributions.LogNormalCircle(mean, stddev, 1000)
         sample_stddev, _, sample_mean = stats.lognorm.fit(numpy.array(lognormalDistribution.distribution), floc=0)
         self.assertAlmostEqual(mean, numpy.log(sample_mean), places=1)
         self.assertAlmostEqual(stddev, sample_stddev, places=1)
@@ -42,7 +42,7 @@ class DistributionsTests(unittest.TestCase):
         """
         mean = 0.0
         stddev = 0.1
-        guassianDistribution = SizeDistributions.Gaussian(mean, stddev, 1000)
+        guassianDistribution = SizeDistributions.GaussianCircle(mean, stddev, 1000)
         sample_mean, sample_stddev = stats.norm.fit(numpy.array(guassianDistribution.distribution))
         self.assertAlmostEqual(mean, sample_mean, places=1)
         self.assertAlmostEqual(stddev, sample_stddev, places=1)
@@ -50,7 +50,7 @@ class DistributionsTests(unittest.TestCase):
     def test_constant_distribution(self):
         size = 0.5
         num = 10
-        constantDistribution = SizeDistributions.Constant(size, num)
+        constantDistribution = SizeDistributions.ConstantCircle(size, num)
         self.assertEqual(num, len(constantDistribution.distribution))
 
         for item in constantDistribution.distribution:
@@ -58,7 +58,7 @@ class DistributionsTests(unittest.TestCase):
 
     def test_random_distribution(self):
         num = 1000000
-        randomDistribution = SizeDistributions.Random(num)
+        randomDistribution = SizeDistributions.RandomCircle(num)
         self.assertEqual(num, len(randomDistribution.distribution))
 
         #Check that the mean is close enough to 0.5

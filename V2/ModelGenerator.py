@@ -17,7 +17,7 @@ inclusion_material = Materials.MaterialFactory.createMaterial(Materials.material
 inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
 
 #Create the distribution and location to use, and generate the inclusions
-dist = SizeDistributions.Random(NUM_INCLUSIONS)
+dist = SizeDistributions.RandomCircle(NUM_INCLUSIONS)
 loc = Locations.RandomLocation(NUM_INCLUSIONS)
 
 circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials, recurse_attempts=10)

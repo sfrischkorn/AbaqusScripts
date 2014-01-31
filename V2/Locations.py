@@ -172,17 +172,21 @@ class FixedLocation(Location):
 
     def GenerateInclusion(self, distribution, material, existing_circles, inclusion_shape=Shapes.shapes.CIRCLE, max_attempts=None, recurse_attempts=0, size=None):
         #Pick a size from the distribution
-        size = distribution.retrieve_sample()
+        args = distribution.retrieve_sample()
 
         #Find the location for it
         location = self.retrieve_location()
 
+        args['material'] = material
+        args['centre'] = location
+
         #Generate the shape object
-        myCircle = Shapes.ShapeFactory.createShape(Shapes.shapes.CIRCLE, material=material,centre=location, radius=size)
+        #inclusion = Shapes.ShapeFactory.createShape(inclusion_shape, material=material,centre=location, radius=size)
+        inclusion = Shapes.ShapeFactory.createShape(inclusion_shape, **args)
 
         #Test that it fits there. If not, find a new location
-        if (not myCircle.check_intersect(existing_circles)):
-            return myCircle
+        if (not inclusion.check_intersect(existing_circles)):
+            return inclusion
         else:
             return None
 
