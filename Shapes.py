@@ -1,6 +1,5 @@
 from __future__ import division
 import math
-import Materials
 from itertools import groupby
 from random import uniform
 from sympy import Ellipse as el
@@ -66,7 +65,7 @@ class Shape(object):
     def Area(self):
         pass
 
-    def Orientation():
+    def Orientation(self):
         pass
 
     def GenerateSketch(self):

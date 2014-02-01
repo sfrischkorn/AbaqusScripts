@@ -1,12 +1,10 @@
 from __future__ import division
-import numpy
 import logging
-import sys
 import random
-import Shapes
-import SizeDistributions
 from math import ceil, sqrt
 from types import IntType
+
+import Shapes
 
 
 class Location(object):
@@ -265,7 +263,6 @@ class RandomLocation(Location):
 
             if location_ok:
                 return centre
-                break
 
             if (attempts / 1000).is_integer():
                 logging.debug('{0} location attempts'.format(attempts))

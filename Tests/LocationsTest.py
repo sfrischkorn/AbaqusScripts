@@ -8,6 +8,7 @@ import Locations
 import Materials
 import Shapes
 import SizeDistributions
+import SizeDistributions.Circle
 
 import turtle
 
@@ -184,7 +185,7 @@ class LocationsTests(unittest.TestCase):
         inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
 
         #Create the distribution and location to use, and generate the inclusions
-        dist = SizeDistributions.ConstantCircle(INCLUSION_SIZE, NUM_INCLUSIONS)
+        dist = SizeDistributions.Circle.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
         loc = Locations.FixedLocation(generate_lattice=True, num_locations=4)
         circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials)
 
@@ -225,7 +226,7 @@ class LocationsTests(unittest.TestCase):
         inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
 
         #Create the distribution and location to use, and generate the inclusions
-        dist = SizeDistributions.RandomCircle(NUM_INCLUSIONS)
+        dist = SizeDistributions.Circle.Random(NUM_INCLUSIONS)
         loc = Locations.RandomLocation(NUM_INCLUSIONS, buffersize=0, scale_factor=1)
         circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials, recurse_attempts=5, max_attempts=50)
 
@@ -243,10 +244,10 @@ class LocationsTests(unittest.TestCase):
         #This is going to use the same material for all inclusions
         inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
 
-        max_radius = Shapes.Circle.determine_max_radius(0, 4, 1)
+        max_radius = Shapes.Circle.determine_max_radius(0, 3, 1)
 
         #Create the distribution and location to use, and generate the inclusions
-        dist = SizeDistributions.GaussianCircle(max_radius / 2, max_radius / 2, NUM_INCLUSIONS)
+        dist = SizeDistributions.Circle.Gaussian(max_radius / 2, max_radius / 2, NUM_INCLUSIONS)
         loc = Locations.FixedLocation(generate_lattice=True, num_locations=NUM_INCLUSIONS, buffersize=0, scalefactor=1)
         circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials, recurse_attempts=5, max_attempts=50)
 

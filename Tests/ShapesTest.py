@@ -5,6 +5,7 @@ parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parentdir)
 import Shapes
 import SizeDistributions
+import SizeDistributions.Circle
 import Locations
 import Materials
 
@@ -128,7 +129,7 @@ class ShapesTests(unittest.TestCase):
         ellipse1 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION, short_axis=1, long_axis=2)
         ellipse2 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION2, short_axis=1, long_axis=2)
 
-        result = ellipse1.check_intersect(ellipse2)
+        result = ellipse1.check_intersect([ellipse2])
         self.assertTrue(result)
 
     def test_ellipses_intersect_false(self):
@@ -137,7 +138,7 @@ class ShapesTests(unittest.TestCase):
         ellipse1 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION, short_axis=1, long_axis=2)
         ellipse2 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION2, short_axis=1, long_axis=2)
 
-        result = ellipse1.check_intersect(ellipse2)
+        result = ellipse1.check_intersect([ellipse2])
         self.assertFalse(result)
 
     def test_ellipses_intersect_contains_true(self):
@@ -146,7 +147,7 @@ class ShapesTests(unittest.TestCase):
         ellipse1 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION, short_axis=10, long_axis=20)
         ellipse2 = Shapes.ShapeFactory.createShape(Shapes.shapes.ELLIPSE, material=None, centre=LOCATION2, short_axis=1, long_axis=2)
 
-        result = ellipse1.check_intersect(ellipse2)
+        result = ellipse1.check_intersect([ellipse2])
         self.assertTrue(result)
 
     def test_export(self):
@@ -161,7 +162,7 @@ class ShapesTests(unittest.TestCase):
         matrix_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Matrix', youngs_modulus=3000, poissons_ratio=0.25)
 
         #Create the distribution and location to use, and generate the inclusions
-        dist = SizeDistributions.ConstantCircle(INCLUSION_SIZE, NUM_INCLUSIONS)
+        dist = SizeDistributions.Circle.Constant(INCLUSION_SIZE, NUM_INCLUSIONS)
         loc = Locations.FixedLocation(generate_lattice=True, num_locations=4)
         circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials)
 
