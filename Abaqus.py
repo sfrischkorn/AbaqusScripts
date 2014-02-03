@@ -11,7 +11,8 @@ from sketch import *
 from visualization import *
 from connectorBehavior import *
 
-def GenerateModel(inclusions, matrix_material):
+
+def GenerateModel(inclusions, matrix_material, matrix_mesh_control):
     #Define constants
     modelName = 'Single Inclusion'
     partName = 'Part-1'
@@ -46,7 +47,7 @@ def GenerateModel(inclusions, matrix_material):
 
 
     i = 0
-    for inclusion in inclusions:
+    for inclusion, inclusion_mesh_control in inclusions:
         commands = inclusion.GenerateSketch()
 
         for command in commands:
@@ -67,13 +68,18 @@ def GenerateModel(inclusions, matrix_material):
         inclusionFaces = f.findAt(((inclusion.centre[0], inclusion.centre[1], 0.0), ))
         inclusionRegion = p.Set(faces=inclusionFaces, name=setname)
         p.SectionAssignment(region=inclusionRegion, sectionName=sectionname, offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
-        p.setMeshControls(regions=inclusionFaces, elemShape=TRI)
+        #p.setMeshControls(regions=inclusionFaces, elemShape=inclusion_mesh_control.elem_shape, technique=inclusion_mesh_control.technique, algorithm=inclusion_mesh_control.algorithm, minTransition=inclusion_mesh_control.min_transition, sizeGrowth=inclusion_mesh_control.size_growth, allowMapped=inclusion_mesh_control.allow_mapped)
+        cmd = inclusion_mesh_control.GenerateCommand('inclusionFaces')
+        exec(cmd)
 
 
     #Create sets and sections
     matrixFaces = f.findAt(((0.001, 0.001, 0.0), )) # TODO: find a way to find a spot that isn't taken with inclusions
     matrixRegion = p.Set(faces=matrixFaces, name=setName)
     p.SectionAssignment(region=matrixRegion, sectionName=matrix_section_name, offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
+    #p.setMeshControls(regions=matrixFaces, elemShape=matrix_mesh_control.elem_shape, technique=matrix_mesh_control.technique, algorithm=matrix_mesh_control.algorithm, minTransition=matrix_mesh_control.min_transition, sizeGrowth=matrix_mesh_control.size_growth, allowMapped=matrix_mesh_control.allow_mapped)
+    cmd = matrix_mesh_control.GenerateCommand('matrixFaces')
+    exec(cmd)
 
 
     #Create the assembly
