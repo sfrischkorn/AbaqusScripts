@@ -71,26 +71,26 @@ class Shape(object):
     def GenerateSketch(self):
         pass
 
-    @staticmethod
-    def ExportInclusions(shapes, matrix_material):
-        output_str = ''
-        materials_used = []
-        for key, group in groupby(sorted(shapes, key=lambda shape: shape.material), lambda x: x.material):
-            materials_used.append(key)
-            output_str += 'Material: {0}:\n'.format(key.name)
-            for shape in group:
-                output_str += '\t{0}\n'.format(shape)
+#    @staticmethod
+#    def ExportInclusions(shapes, matrix_material):
+#        output_str = ''
+#        materials_used = []
+#        for key, group in groupby(sorted(shapes, key=lambda shape: shape.material), lambda x: x.material):
+#            materials_used.append(key)
+#            output_str += 'Material: {0}:\n'.format(key.name)
+#            for shape in group:
+#                output_str += '\t{0}\n'.format(shape)
 
-            output_str += '\n'
+#           output_str += '\n'
 
-        output_str += 'Materials:\n'
-        for mat in materials_used:
-            output_str += '\t{0}\n'.format(mat)
+#       output_str += 'Materials:\n'
+#       for mat in materials_used:
+#           output_str += '\t{0}\n'.format(mat)
 
-        output_str += '\nMatrix Material:\n'
-        output_str += '\t{0}'.format(matrix_material)
+#        output_str += '\nMatrix Material:\n'
+#        output_str += '\t{0}'.format(matrix_material)
 
-        return output_str
+#        return output_str
 
 
 class Ellipse(Shape):
@@ -110,6 +110,9 @@ class Ellipse(Shape):
 
     def Area(self):
         return math.pi * self.short_axis * self.long_axis
+
+    def AspectRatio(self):
+        return self.short_axis / self.long_axis
 
     def GenerateSketch(self):
         commands = []
@@ -143,8 +146,21 @@ class Ellipse(Shape):
         return False
 
     def __str__(self):
-        return 'Centre: {0}, horizontal axis: {1}., vertical axis: {2}, angle: {3}'.\
-            format(self.centre, self.long_axis, self.short_axis, self.angle)
+        return '{0}, {1}, {2}, {3}, {4}, {5}, {6}'.format(self.centre[0], self.centre[1], self.long_axis, self.short_axis, self.AspectRatio(), self.Area(), self.angle)
+
+    @staticmethod
+    def ExportInclusions(shapes):
+        output_str = '**Matrix:\n'
+        output_str += '**Bottom left corner X, Bottom left corner Y, height, width\n'
+        output_str += '0, 0, 1, 1\n\n'
+
+        output_str += '**Ellipse distribution\n'
+        output_str += '**Centre X, centre Y, long axis, short axis, aspect ratio, area, orientation(rad)\n'
+        for shape in shapes:
+            output_str += '{0}\n'.format(shape)
+
+        return output_str
+
 
     class Factory:
         def create(self, **kwargs):
@@ -242,7 +258,21 @@ class Circle(Ellipse):
         return False
 
     def __str__(self):
-        return 'Centre: {0}, radius: {1}.'.format(self.centre, self.radius)
+        return '{0}, {1}, {2}, {3}'.format(self.centre[0], self.centre[1], self.radius, self.Area())
+
+    @staticmethod
+    def ExportInclusions(shapes):
+        #TODO: Refector this, and the same code in ellipse, and change it from being hard coded
+        output_str = '**Matrix:\n'
+        output_str += '**Bottom left corner X, Bottom left corner Y, height, width\n'
+        output_str += '0, 0, 1, 1\n\n'
+
+        output_str += '**Circle distribution\n'
+        output_str += '**Centre X, centre Y, radius, area\n'
+        for shape in shapes:
+            output_str += '{0}\n'.format(shape)
+
+        return output_str
 
     class Factory:
         def create(self, **kwargs):

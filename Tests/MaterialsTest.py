@@ -30,6 +30,16 @@ class MaterialsTests(unittest.TestCase):
 
         self.assertEqual("model.materials['mat'].Elastic(table=((20000, 2), ))", commands[1])
 
+    def test_export(self):
+        mat = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name="mat", youngs_modulus = 20000, poissons_ratio = 2)
+        mat1 = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name="mat", youngs_modulus = 150000, poissons_ratio = 2.5)
+
+        matrixmat = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name="mat", youngs_modulus = 150000, poissons_ratio = 2.5)
+
+        output = Materials.Material.export_materials(matrixmat, [mat, mat1])
+
+        print output
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(MaterialsTests)
     unittest.TextTestRunner(verbosity=2).run(suite)

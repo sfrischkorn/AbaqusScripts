@@ -44,6 +44,23 @@ class Material(object):
     def generate_section_command(self, model_name, section_name):
         return "{0}.HomogeneousSolidSection(material='{1}', name='{2}', thickness=None)".format(model_name, self.name, section_name)
 
+    @staticmethod
+    def export_materials(matrix_material, inclusion_materials):
+        output_str = '**Matrix Material\n'
+
+        output_str += type(matrix_material).get_export_header()
+        output_str += '{0}\n\n'.format(matrix_material)
+
+        output_str += '**Inclusion Materials\n'
+        types = set([type(x) for x in inclusion_materials])
+
+        for my_type in types:
+            output_str += my_type.get_export_header()
+
+            for item in (mat for mat in inclusion_materials if type(mat) == my_type):
+                output_str += '{0}\n'.format(item)
+
+        return output_str
 
 class Elastic(Material):
     youngs_modulus = 0.0
@@ -65,8 +82,13 @@ class Elastic(Material):
 
         return commands
 
+    @staticmethod
+    def get_export_header():
+        return "**Elastic\n**Young's Modulus, Poisson's Ratio\n"
+
     def __str__(self):
-        return "Elastic: Name; {0}, Young's Modulus: {1}, Poisson's Ratio: {2}".format(self.name, self.youngs_modulus, self.poissons_ratio)
+        return '{0}, {1}'.format(self.youngs_modulus, self.poissons_ratio)
+        #return "Elastic: Name; {0}, Young's Modulus: {1}, Poisson's Ratio: {2}".format(self.name, self.youngs_modulus, self.poissons_ratio)
 
 
     class Factory:
