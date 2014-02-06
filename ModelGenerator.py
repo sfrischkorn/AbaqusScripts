@@ -7,9 +7,9 @@ import Shapes
 import Materials
 import Mesh
 
+import numpy
 
-
-NUM_INCLUSIONS = 2
+NUM_INCLUSIONS = 60
 
 #Create the material for the matrix
 matrix_material = Materials.MaterialFactory.createMaterial(Materials.materials.ELASTIC, name='Matrix', youngs_modulus=1000, poissons_ratio=0.2)
@@ -24,10 +24,17 @@ inclusion_mesh = [Mesh.Mesh(elem_shape=QUAD_DOMINATED)] * NUM_INCLUSIONS
 inclusion_materials = [inclusion_material] * NUM_INCLUSIONS
 
 #Create the distribution and location to use, and generate the inclusions
-dist = SizeDistributions.Circle.Random(NUM_INCLUSIONS)
+dist = SizeDistributions.Circle.Gaussian(0.15, 0.03, NUM_INCLUSIONS)
 loc = Locations.RandomLocation(NUM_INCLUSIONS)
 
 circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials, recurse_attempts=10)
+
+output = '['
+for circle in circles:
+    output += '{0}, '.format(circle.radius)
+output = output[:-3]
+output += ']'
+print output
 
 inclusions = zip(circles, inclusion_mesh)
 

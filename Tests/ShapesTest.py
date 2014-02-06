@@ -166,7 +166,7 @@ class ShapesTests(unittest.TestCase):
         loc = Locations.FixedLocation(generate_lattice=True, num_locations=4)
         circles = Locations.Location.GenerateInclusions(NUM_INCLUSIONS, dist, loc, inclusion_materials)
 
-        output = Shapes.Shape.ExportInclusions(circles, matrix_material)
+        output = Shapes.Circle.ExportInclusions(circles)
         print output
 
 if __name__ == '__main__':

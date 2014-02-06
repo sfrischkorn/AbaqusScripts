@@ -32,8 +32,10 @@ class Random(Circle):
     def __init__(self, num_inclusions, lower=0.001, upper=0.999):
         super(Random, self).__init__()
 
-        self.distribution = [uniform(lower, upper) for
-                             x in range(num_inclusions)]
+        #self.distribution = dict({'radius': [uniform(lower, upper)}) for
+                             #x in range(num_inclusions)]
+        for inclusion in range(num_inclusions):
+            self.distribution.append(dict({'radius': uniform(lower, upper)}))
 
 class Gaussian(Circle):
     """
@@ -42,7 +44,6 @@ class Gaussian(Circle):
     """
     def __init__(self, centre, stdev, num_inclusions):
         super(Gaussian, self).__init__()
-
         for size in numpy.random.normal(centre, stdev, num_inclusions).tolist():
             self.distribution.append(dict({'radius': size}))
 

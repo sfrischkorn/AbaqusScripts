@@ -64,10 +64,10 @@ class DistributionsTests(unittest.TestCase):
         self.assertEqual(num, len(randomDistribution.distribution))
 
         #Check that the mean is close enough to 0.5
-        self.assertAlmostEqual(0.5, numpy.mean(randomDistribution.distribution), 2)
+        self.assertAlmostEqual(0.5, numpy.mean(randomDistribution.get_values()), 2)
 
         #Check that the samples are distributed evenly across the range
-        hist, _ = numpy.histogram(randomDistribution.distribution)
+        hist, _ = numpy.histogram(randomDistribution.get_values())
         for bin in hist.tolist():
             self.assertAlmostEqual(bin / (num / 10), 1.0, 1)
 

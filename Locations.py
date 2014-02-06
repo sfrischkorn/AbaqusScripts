@@ -1,6 +1,7 @@
 from __future__ import division
 import logging
 import random
+import sys
 from math import ceil, sqrt
 from types import IntType
 
@@ -25,7 +26,7 @@ class Location(object):
         for i in range(num_inclusions):
             inclusion = locations.GenerateInclusion(distribution, materials[i], inclusions, inclusion_shape, max_attempts, recurse_attempts, size)
             if inclusion:
-                print 'Generated {0} inclusions'.format(len(inclusions))
+                print 'Generated {0} inclusions'.format(len(inclusions) + 1)
                 inclusions.append(inclusion)
 
         return inclusions
@@ -278,7 +279,7 @@ class RandomLocation(Location):
         attempts = 0
 
         if not size:
-            size = distribution.retrieve_sample()
+            size = distribution.retrieve_sample()["radius"]
         logging.debug('Recurse level {0}, size {1}'.format(recurse_attempts, size))
         while True:
             if attempts == max_attempts:
